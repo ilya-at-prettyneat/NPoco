@@ -11,6 +11,9 @@
 	<PackageProjectUrl>https://github.com/schotime/NPoco</PackageProjectUrl>
     <LangVersion>latest</LangVersion>
 	<nullable>enable</nullable>
+	<AssemblyVersion>5.1.3.0</AssemblyVersion>
+	<FileVersion>5.1.3.0</FileVersion>
+	<Version>5.1.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\NPoco\NPoco.csproj" />
+    <ProjectReference Include="..\NPoco\NPoco.csproj" />
   </ItemGroup>
 
 </Project>

@@ -146,7 +146,7 @@ namespace NPoco
             return maxLen;
         }
 
-        public IEnumerable<PocoMemberPlan> GetPocoMembers(ColumnInfo[] columnInfos, List<MemberInfo> memberInfos, string prefix = null)
+        public IEnumerable<PocoMemberPlan> GetPocoMembers(ColumnInfo[] columnInfos, List<MemberInfo> memberInfos, string prefix = null, int? depthLimit = null)
         {            
             var capturedMembers = memberInfos.ToArray();
             var capturedPrefix = prefix;
@@ -170,12 +170,12 @@ namespace NPoco
                 var members = new List<MemberInfo>(capturedMembers) { columnInfo.MemberInfo };
 
                 // Never map anything beyond the hard set limit, if one has been set
-                if ( columnInfo.HardDepthLimit.HasValue)
-                {
-                    if (_LongestUnbrokenTypeSequence(members.Select(m => m.GetMemberInfoType())) > columnInfo.HardDepthLimit.Value)
+                //the limit is set when navigating down below and always refers to the root property that was navigated from
+                if (depthLimit.HasValue)
+                {                    
+                    if (_LongestUnbrokenTypeSequence(members.Select(m => m.GetMemberInfoType())) > depthLimit.Value)
                         continue;
                 }
-                    
 
                 if (columnInfo.ComplexMapping || columnInfo.ReferenceType != ReferenceType.None)
                 {
@@ -193,8 +193,10 @@ namespace NPoco
 
                     var newPrefix = JoinStrings(capturedPrefix, columnInfo.ReferenceType != ReferenceType.None ? "" : (columnInfo.ComplexPrefix ?? columnInfo.MemberInfo.Name));
 
-                    childrenPlans.AddRange(GetPocoMembers(childColumnInfos, members, newPrefix));
+                    //if a depth limit is already set, use that. Otherwise start a new root if necessary, otherwise ignore
+                    childrenPlans.AddRange(GetPocoMembers(childColumnInfos, members, newPrefix, depthLimit ?? columnInfo.HardDepthLimit ?? null));
                 }
+
 
                 MemberInfo capturedMemberInfo = columnInfo.MemberInfo;
                 ColumnInfo capturedColumnInfo = columnInfo;
